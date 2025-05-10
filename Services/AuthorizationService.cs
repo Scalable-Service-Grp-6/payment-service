@@ -55,7 +55,10 @@ namespace PaymentService.Services
                 var authurl = _appSettings?.AUTH_URL;
                 _client.DefaultRequestHeaders.Authorization =
         new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-                var response = await _client.GetAsync($"http://{authurl}/users/verify/user?role=admin");
+                authurl = $"http://{authurl}/users/verify/user?role=admin";
+                await Console.Out.WriteLineAsync($"authUrl: {authurl}");
+                await Console.Out.WriteLineAsync($"token : {token}");
+                var response = await _client.GetAsync(authurl);
                 response.EnsureSuccessStatusCode(); // throws if not 2xx
 
                 string content = await response.Content.ReadAsStringAsync();
@@ -68,9 +71,19 @@ namespace PaymentService.Services
                     case true:
                         return false.ToString();
                     default:
-                        throw;
+                        {
+                            await Console.Out.WriteLineAsync($"{nameof(HttpRequestException)}: {Convert.ToString(ex)}");
+
+                            throw;
+                        }
                 }
             }
+            catch  (Exception ex)
+            {
+                await Console.Out.WriteLineAsync($"{nameof(Exception)}: {Convert.ToString(ex)}");
+                throw;
+            }
+
         }
     }
 }

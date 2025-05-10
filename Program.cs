@@ -6,6 +6,11 @@ using System.Runtime;
 
 internal class Program
 {
+    private const string MONGODB_ADMIN_USER_NAME = "$(MONGODB_ADMIN_USER_NAME)";
+    private const string MONGODB_ADMIN_USER_PASSWORD = "$(MONGODB_ADMIN_USER_PASSWORD)";
+    private const string MONGODB_URL_PATH = "$(MONGODB_URL_PATH)";
+    private const string MONGODB_USER_DB = "$(MONGODB_USER_DB)";
+
     private static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
@@ -16,7 +21,7 @@ internal class Program
 
         var MONGODB_URL = Environment.GetEnvironmentVariable("MONGODB_URL");
         var MONGODB_DB_NAME = Environment.GetEnvironmentVariable("MONGODB_DB_NAME");
-        var AUTH_URL =  Environment.GetEnvironmentVariable("AUTH_URL");
+        var AUTH_URL = Environment.GetEnvironmentVariable("AUTH_URL");
 
         AppSettings? appSettings;
         if (string.IsNullOrEmpty(MONGODB_URL) || string.IsNullOrEmpty(MONGODB_DB_NAME) || string.IsNullOrEmpty(AUTH_URL))
@@ -25,6 +30,9 @@ internal class Program
         }
         else
         {
+            Console.WriteLine(AUTH_URL);
+            Console.WriteLine(MONGODB_DB_NAME);
+            Console.WriteLine(MONGODB_URL);
             appSettings = new AppSettings
             {
                 AUTH_URL = AUTH_URL,

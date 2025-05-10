@@ -51,13 +51,14 @@ spec:
             configMapKeyRef:
               name: movie-booking-system-config
               key: database_name
+              key: database_name
         - name: MONGODB_USER_DB
           valueFrom:
             configMapKeyRef:
               name: movie-booking-system-config
               key: database_user_db
         - name: MONGODB_URL
-          value: "mongodb://$(MONGODB_ADMIN_USER_NAME):$(MONGODB_ADMIN_USER_PASSWORD)@$(MONGODB_URL_PATH)/$(MONGODB_USER_DB)?authSource=admin"
+          value: "mongodb://$(MONGODB_ADMIN_USER_NAME):$(MONGODB_ADMIN_USER_PASSWORD)@$(MONGODB_URL_PATH)/?authSource=admin"
         - name: DB_CONNECTION_RETRY_TIMEOUT  
           value: "5000"          
         - name: AUTH_ROOT_URL
@@ -66,7 +67,7 @@ spec:
               name: movie-booking-system-config
               key: user_service_url
         - name: AUTH_URL
-          value: "$(AUTH_ROOT_URL):4000"
+          value: "$(AUTH_ROOT_URL)"
       volumes:
         - name: config-volume
           configMap:
