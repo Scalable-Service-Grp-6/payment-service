@@ -1,0 +1,20 @@
+﻿version: '3.8'
+
+services:
+  mongo:
+    image: mongo:8.0
+    container_name: ss_grp6_local-mongo
+
+    ports:
+      - "8000:27017"    # Host port 8000 → Container port 27017
+
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin
+      MONGO_INITDB_DATABASE: movie_booking_db
+
+    volumes:
+      - mongo_data:/data/db
+
+volumes:
+  mongo_data: {}
