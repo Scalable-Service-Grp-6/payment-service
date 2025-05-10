@@ -9,14 +9,20 @@ public class PaymentController : ControllerBase
 {
 
     private readonly IPaymentService _paymentService;
-    public PaymentController(IPaymentService paymentService)
+    private readonly IConfiguration _configuration;
+    public PaymentController(IPaymentService paymentService, IConfiguration configuration)
     {
         _paymentService = paymentService;
+        _configuration = configuration;
     }
 
     [HttpPost]
     public async Task<IActionResult> ProcessAsync([FromBody] PaymentRequest request)
     {
+        //validate whether the incoming request is valid
+
+
+        var appSettings = _configuration.GetConnectionString("MongoDb");
 
         var response = await _paymentService.ProcessPaymentAsync(request);
         return Ok(response);

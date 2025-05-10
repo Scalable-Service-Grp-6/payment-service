@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: payment-app-config
+data:
+  appsettings.json: |
+    {
+      "MongoDbSettings": {
+            "ConnectionString": "mongodb://admin:admin@localhost:8000/?authSource=admin",
+            "Database": "movie_booking_db"
+        }
+    }
