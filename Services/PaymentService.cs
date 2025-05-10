@@ -8,7 +8,7 @@ namespace PaymentService.Services
 {
     public enum PaymentStaus
     {
-        initiated, processed, completed
+        PENDING, PAID, FAILED
     }
     /// <summary>
     /// 
@@ -39,21 +39,23 @@ namespace PaymentService.Services
                     Amount = request.Amount,
                     BankDetails = request.BankDetails,
                     MethodType = request.MethodType,
-                    MovieId = request.MovieId,
+                    //MovieId = request.MovieId,
+                    BookRequestId = request.BookingRequestId,
                     PaymentDetails = request.PaymentDetails,
                     Timestamp = request.Timestamp,
-                    UserId = request.UserId,
-                    Status = nameof(PaymentStaus.completed),
-                    TrasnsactionId = Guid.NewGuid().ToString()
+                    //UserId = request.UserId,
+                    PaymentStatus = nameof(PaymentStaus.PAID),
+                    trasnsactionId = Guid.NewGuid().ToString()
                 };
                 await _context.Payments.InsertOneAsync(document);
 
                 var response = new PaymentResponse
                 {
-                    TransactionId = document.TrasnsactionId,
-                    IsSuccess = true,
-                    MovieId = request.MovieId,
-                    UserId = request.UserId,
+                    TransactionId = document.trasnsactionId,
+                    PaymentStatus = nameof(PaymentStaus.PAID),
+                    //MovieId = request.MovieId,
+                    //UserId = request.UserId,
+                    BookRequestId = request.BookingRequestId
                 };
                 return response;
 
@@ -63,9 +65,8 @@ namespace PaymentService.Services
                 var response = new PaymentResponse
                 {
                     FailureReason = Convert.ToString(ex),
-                    IsSuccess = false,
-                    MovieId = request.MovieId,
-                    UserId = request.UserId,
+                    PaymentStatus = nameof(PaymentStaus.FAILED),
+                    BookRequestId = request.BookingRequestId
                 };
                 return response;
             }
@@ -77,11 +78,14 @@ namespace PaymentService.Services
             if (request == null)
                 throw new ArgumentNullException(nameof(request), "Payment request cannot be null.");
 
-            if (string.IsNullOrWhiteSpace(request.UserId))
-                throw new ArgumentException("User ID is required.", nameof(request.UserId));
+            if (string.IsNullOrWhiteSpace(request.BookingRequestId))
+                throw new ArgumentException("Booking Request id is required.", nameof(request.BookingRequestId));
 
-            if (string.IsNullOrWhiteSpace(request.MovieId))
-                throw new ArgumentException("Movie ID is required.", nameof(request.MovieId));
+            //if (string.IsNullOrWhiteSpace(request.UserId))
+            //    throw new ArgumentException("User ID is required.", nameof(request.UserId));
+
+            //if (string.IsNullOrWhiteSpace(request.MovieId))
+            //    throw new ArgumentException("Movie ID is required.", nameof(request.MovieId));
 
             if (request.Amount <= 0)
                 throw new ArgumentException("Amount must be greater than zero.", nameof(request.Amount));

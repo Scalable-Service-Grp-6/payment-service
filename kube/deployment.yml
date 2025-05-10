@@ -28,6 +28,45 @@ spec:
           requests:
             cpu: "0.2"
             memory: "128Mi"
+        env:
+        - name: MONGODB_ADMIN_USER_NAME
+          valueFrom:
+            secretKeyRef:
+              name: movie-booking-system-secret
+              key: mongodb-root-username
+        - name: MONGODB_ADMIN_USER_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: movie-booking-system-secret
+              key: mongodb-root-password
+        - name: PORT
+          value: "4000"
+        - name: MONGODB_URL_PATH
+          valueFrom:
+            configMapKeyRef:
+              name: movie-booking-system-config
+              key: database_url
+        - name: MONGODB_DB_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: movie-booking-system-config
+              key: database_name
+        - name: MONGODB_USER_DB
+          valueFrom:
+            configMapKeyRef:
+              name: movie-booking-system-config
+              key: database_user_db
+        - name: MONGODB_URL
+          value: "mongodb://$(MONGODB_ADMIN_USER_NAME):$(MONGODB_ADMIN_USER_PASSWORD)@$(MONGODB_URL_PATH)/$(MONGODB_USER_DB)?authSource=admin"
+        - name: DB_CONNECTION_RETRY_TIMEOUT  
+          value: "5000"          
+        - name: AUTH_ROOT_URL
+          valueFrom:
+            configMapKeyRef:
+              name: movie-booking-system-config
+              key: user_service_url
+        - name: AUTH_URL
+          value: "$(AUTH_ROOT_URL):4000"
       volumes:
         - name: config-volume
           configMap:

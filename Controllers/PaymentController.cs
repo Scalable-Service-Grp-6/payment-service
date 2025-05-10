@@ -9,23 +9,29 @@ public class PaymentController : ControllerBase
 {
 
     private readonly IPaymentService _paymentService;
-    private readonly IConfiguration _configuration;
-    public PaymentController(IPaymentService paymentService, IConfiguration configuration)
+    private readonly IAuthService _authService;
+
+    public PaymentController(IPaymentService paymentService, IAuthService authService)
     {
         _paymentService = paymentService;
-        _configuration = configuration;
+        _authService = authService;
     }
 
     [HttpPost]
     public async Task<IActionResult> ProcessAsync([FromBody] PaymentRequest request)
     {
         //validate whether the incoming request is valid
+        var authResponse = await _authService.ValidateToken(HttpContext.Request);
+        if (authResponse.IsValidToken)
+        {
+            
+            var response = await _paymentService.ProcessPaymentAsync(request);
+            return Ok(response);
+        }
+        else {
 
-
-        var appSettings = _configuration.GetConnectionString("MongoDb");
-
-        var response = await _paymentService.ProcessPaymentAsync(request);
-        return Ok(response);
+            return Unauthorized("User is not authorized to do the transaction.");
+        }
     }
 
     [HttpGet]

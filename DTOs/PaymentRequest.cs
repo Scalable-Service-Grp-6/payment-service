@@ -1,21 +1,37 @@
-﻿namespace PaymentService.DTOs
+﻿using System.Text.Json.Serialization;
+
+namespace PaymentService.DTOs
 {
     public class PaymentRequest
     {
-
         /// <summary>
         /// Identifier for the user involved in the transaction.
         /// </summary>
-        public string? UserId { get; set; }
+        [JsonPropertyName("bookRequestId")]
+        public string? BookingRequestId { get; set; }
 
-        /// <summary>
-        /// THe Movie/Show against  which the payment is made
-        /// </summary>
-        public string? MovieId { get; set; }
+        ///// <summary>
+        ///// Identifier for the user involved in the transaction.
+        ///// </summary>
+        //[JsonPropertyName("userId")]
+        //public string? UserId { get; set; }
+
+        ///// <summary>
+        ///// THe Movie/Show against  which the payment is made
+        ///// </summary>
+        //[JsonPropertyName("movieId")]
+        //public string? MovieId { get; set; }
+
+        ///// <summary>
+        ///// Show Time Id
+        ///// </summary>
+        //[JsonPropertyName("showtimeId")]
+        //public string? ShowTimeId { get; set; }
 
         /// <summary>
         /// Transaction amount
         /// </summary>
+        [JsonPropertyName("amount")]
         public decimal Amount { get; set; }
 
         /// <summary>
