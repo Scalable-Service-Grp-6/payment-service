@@ -1,4 +1,5 @@
-﻿using PaymentService.DTOs;
+﻿using MongoDB.Driver;
+using PaymentService.DTOs;
 using PaymentService.Interfaces;
 using PaymentService.Models;
 using PaymentService.Module;
@@ -73,6 +74,33 @@ namespace PaymentService.Services
             
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public async Task<List<PaymentResponse>> GetPaymentsAsync()
+        {
+
+            List<PaymentResponse> response = new List<PaymentResponse>();
+            List<PaymentTransaction> transactions = await _context.Payments.Find(_ => true).ToListAsync();
+
+
+            foreach (var transaction in transactions)
+            {
+                response.Add(new PaymentResponse
+                {
+                    BookRequestId = transaction.BookRequestId,
+                    FailureReason = "",
+                    PaymentStatus = transaction.PaymentStatus,
+                    TransactionId = transaction.trasnsactionId
+                });
+            }
+
+            return response;
+
+
+        }
         private void ValidatePaymentRequest(PaymentRequest request)
         {
             if (request == null)
