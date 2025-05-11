@@ -51,7 +51,6 @@ spec:
             configMapKeyRef:
               name: movie-booking-system-config
               key: database_name
-              key: database_name
         - name: MONGODB_USER_DB
           valueFrom:
             configMapKeyRef:
