@@ -35,8 +35,19 @@ public class PaymentController : ControllerBase
     }
 
     [HttpGet]
-    public IActionResult GetPayments()
+    public async Task<IActionResult> GetPayments()
     {
-        return Ok(new PaymentRequest());
+        var authResponse = await _authService.ValidateToken(HttpContext.Request);
+        if (authResponse.IsValidToken)
+        {
+
+            var response = await _paymentService.GetPaymentsAsync();
+            return Ok(response);
+        }
+        else
+        {
+
+            return Unauthorized("User is not authorized to do the transaction.");
+        }
     }
 }
