@@ -1,23 +1,46 @@
-﻿
-
-using PaymentService.DTOs;
+﻿using PaymentService.DTOs;
 using PaymentService.Interfaces;
-using System.Text.Json;
-using System.Text;
-using MongoDB.Driver;
 using System.Net;
 
-namespace PaymentService.Services
+namespace PaymentService.Middleware
 {
-    public class AuthService : IAuthService
+    public class AuthorizationMiddleware
     {
+        private readonly RequestDelegate _next;
         private readonly AppSettings? _appSettings;
 
-        public AuthService(AppSettings appSettings)
+        public AuthorizationMiddleware(RequestDelegate next, AppSettings? appSettings)
         {
             _appSettings = appSettings;
-
+            _next = next;
         }
+
+        public async Task Invoke(HttpContext context)
+        {
+            // Example: Check for a token in the Authorization header
+            var authHeader = context.Request.Headers["Authorization"].FirstOrDefault();
+
+            if (string.IsNullOrEmpty(authHeader) || !authHeader.StartsWith("Bearer "))
+            {
+                context.Response.StatusCode = 401; // Unauthorized
+                await context.Response.WriteAsync("Authorization header missing or invalid.");
+                return;
+            }
+
+            var token = authHeader.Substring("Bearer ".Length).Trim();
+
+            // Validate token (stubbed for demo - replace with real logic)
+            if (! (await ValidateToken(context.Request)).IsValidToken)
+            {
+                context.Response.StatusCode = 403; // Forbidden
+                await context.Response.WriteAsync("Invalid or expired token.");
+                return;
+            }
+
+            // If everything is okay, continue to the next middleware
+            await _next(context);
+        }
+
         public async Task<AuthResponse> ValidateToken(HttpRequest request)
         {
             var authReponse = new AuthResponse();
@@ -26,9 +49,10 @@ namespace PaymentService.Services
             if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("Bearer "))
             {
                 var token = authHeader.Substring("Bearer ".Length).Trim();
-                var response  = await VerifyTokenAsync(token);
+                var response = await VerifyTokenAsync(token);
 
-                if(bool.TryParse(response, out bool isValid)){
+                if (bool.TryParse(response, out bool isValid))
+                {
                     authReponse.IsValidToken = isValid;
                 }
             }
@@ -36,17 +60,6 @@ namespace PaymentService.Services
         }
 
         private static readonly HttpClient _client = new HttpClient();
-
-        public async Task<string> PostDataAsync(object data)
-        {
-            string json = JsonSerializer.Serialize(data);
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-            var response = await _client.PostAsync($"https://api.example.com/create", content);
-            response.EnsureSuccessStatusCode();
-
-            return await response.Content.ReadAsStringAsync();
-        }
 
         public async Task<string> VerifyTokenAsync(string token)
         {
@@ -78,7 +91,7 @@ namespace PaymentService.Services
                         }
                 }
             }
-            catch  (Exception ex)
+            catch (Exception ex)
             {
                 await Console.Out.WriteLineAsync($"{nameof(Exception)}: {Convert.ToString(ex)}");
                 throw;

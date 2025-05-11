@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using PaymentService.DTOs;
 using PaymentService.Interfaces;
+using PaymentService.Middleware;
 using PaymentService.Module;
 using System.Runtime;
 
@@ -17,7 +18,6 @@ internal class Program
         // Register the service with DI container
         builder.Services.AddSingleton<MongoContext>();
         builder.Services.AddTransient<IPaymentService, PaymentService.Services.PaymentService>();
-        builder.Services.AddTransient<IAuthService, PaymentService.Services.AuthService>();
 
         var MONGODB_URL = Environment.GetEnvironmentVariable("MONGODB_URL");
         var MONGODB_DB_NAME = Environment.GetEnvironmentVariable("MONGODB_DB_NAME");
@@ -59,6 +59,8 @@ internal class Program
             app.UseSwagger();
             app.UseSwaggerUI();
         }
+
+        app.UseMiddleware<AuthorizationMiddleware>();
 
         app.UseAuthorization();
 
